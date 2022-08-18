@@ -301,6 +301,7 @@ class MyGame(arcade.Window):
 
         self.level_timer = None
         self.player_score = None
+        self.mode = None
 
         # Variable that will hold a list of shots fired by the player
         self.player_shot_list = None
@@ -347,6 +348,8 @@ class MyGame(arcade.Window):
 
     def setup(self):
         """ Set up the game and initialize the variables. """
+
+        self.mode = "IN_START_SCREEN"
 
         # No points when the game starts
         self.player_score = 0
