@@ -349,6 +349,9 @@ class MyGame(arcade.Window):
     def setup(self):
         """ Set up the game and initialize the variables. """
 
+        # if you'r in startscreen, mode = "IN_START_SCREEN"
+        # if you'r in game, mode = "IN_GAME"
+        # if you'r in deathscreen, mode = "DEATH_SCREEN"
         self.mode = "IN_START_SCREEN"
 
         # No points when the game starts
@@ -400,34 +403,39 @@ class MyGame(arcade.Window):
         # Draw the player sprite
         self.player_sprite.draw()
 
-        # Draw players score on screen
-        arcade.draw_text(
-            "LIVES: {}".format(self.player_sprite.player_lives),  # Text to show
-            10,  # X position
-            SCREEN_HEIGHT - 20,  # Y positon
-            arcade.color.WHITE  # Color of text
-        )
+        if self.mode == "IN_GAME":
 
-        arcade.draw_text(
-            "score: {}".format(int(self.player_score) * 10),  # Text to show
-            10,  # X position
-            SCREEN_HEIGHT - 40,  # Y positon
-            arcade.color.WHITE  # Color of text
-        )
+            # Draw players score on screen
+            arcade.draw_text(
+                "LIVES: {}".format(self.player_sprite.player_lives),  # Text to show
+                10,  # X position
+                SCREEN_HEIGHT - 20,  # Y positon
+                arcade.color.WHITE  # Color of text
+            )
 
-        arcade.draw_text(
-            "Next level in: {}".format(int(self.level_timer)),  # Text to show
-            10,  # X position
-            SCREEN_HEIGHT - 60,  # Y positon
-            arcade.color.WHITE  # Color of text
-        )
+            arcade.draw_text(
+                "score: {}".format(int(self.player_score) * 10),  # Text to show
+                10,  # X position
+                SCREEN_HEIGHT - 40,  # Y positon
+                arcade.color.WHITE  # Color of text
+            )
 
-        arcade.draw_text(
-            "Level: {}".format(int(self.current_level)),  # Text to show
-            10,  # X position
-            SCREEN_HEIGHT - 80,  # Y positon
-            arcade.color.WHITE  # Color of text
-        )
+            arcade.draw_text(
+                "Next level in: {}".format(int(self.level_timer)),  # Text to show
+                10,  # X position
+                SCREEN_HEIGHT - 60,  # Y positon
+                arcade.color.WHITE  # Color of text
+            )
+
+            arcade.draw_text(
+                "Level: {}".format(int(self.current_level)),  # Text to show
+                10,  # X position
+                SCREEN_HEIGHT - 80,  # Y positon
+                arcade.color.WHITE  # Color of text
+            )
+
+        else:
+            pass
 
     def on_update(self, delta_time):
         """
@@ -534,10 +542,17 @@ class MyGame(arcade.Window):
         elif key == arcade.key.RIGHT:
             self.right_pressed = True
 
-        if key == DASHING_KEY:
-            self.player_sprite.dash()
+        if self.mode == "IN_GAME":
+            if key == DASHING_KEY:
+                self.player_sprite.dash()
+        else:
+            pass
 
-            # self.player_shot_list.append(new_shot)
+        if self.mode == "IN_START_SCREEN":
+            if self.key == DASHING_KEY:
+                self.mode = "IN_GAME"
+
+        print(self.mode)
 
     def on_key_release(self, key, modifiers):
         """
