@@ -348,7 +348,6 @@ class MyGame(arcade.Window):
 
     def setup(self):
         """ Set up the game and initialize the variables. """
-
         # if you'r in startscreen, mode = "IN_START_SCREEN"
         # if you'r in game, mode = "IN_GAME"
         # if you'r in deathscreen, mode = "DEATH_SCREEN"
@@ -371,13 +370,22 @@ class MyGame(arcade.Window):
 
         self.number_of_obstacles = 65
 
-        self.new_level()
+        if self.mode == "IN_GAME":
+            self.new_level()
+        else:
+            pass
 
+    def set_mode(self, new_mode):
+
+        if new_mode == "IN_GAME":
+            pass
+
+        self.mode = new_mode
 
     def new_level(self):
+        assert self.mode == "IN_GAME"
 
         self.level_timer = LEVEL_TIME
-
 
         self.obstacle_list = arcade.SpriteList()
         self.number_of_obstacles += self.current_level
@@ -449,90 +457,94 @@ class MyGame(arcade.Window):
         Movement and game logic
         """
 
-        # Calculate player speed based on the keys pressed
-        self.player_sprite.change_x = 0
-        self.player_sprite.change_y = 0
+        if self.mode == "IN_GAME":
 
-        obstacles_colliding_with_player = arcade.check_for_collision_with_list(
-            self.player_sprite, self.obstacle_list
-        )
-        for o in obstacles_colliding_with_player:
-            if self.player_sprite.is_dashing is False and not o.is_harmless:
-                self.player_sprite.taking_damage()
+            # Calculate player speed based on the keys pressed
+            self.player_sprite.change_x = 0
+            self.player_sprite.change_y = 0
 
-        # Move player with keyboard
-        if self.left_pressed and not self.right_pressed:
-            self.player_sprite.change_x = -PLAYER_SPEED_X
+            obstacles_colliding_with_player = arcade.check_for_collision_with_list(
+                self.player_sprite, self.obstacle_list
+            )
+            for o in obstacles_colliding_with_player:
+                if self.player_sprite.is_dashing is False and not o.is_harmless:
+                    self.player_sprite.taking_damage()
 
-        if self.right_pressed and not self.left_pressed:
-            self.player_sprite.change_x = PLAYER_SPEED_X
+            # Move player with keyboard
+            if self.left_pressed and not self.right_pressed:
+                self.player_sprite.change_x = -PLAYER_SPEED_X
 
-        if self.up_pressed and not self.down_pressed:
-            self.player_sprite.change_y = PLAYER_SPEED_Y
+            if self.right_pressed and not self.left_pressed:
+                self.player_sprite.change_x = PLAYER_SPEED_X
 
-        if self.down_pressed and not self.up_pressed:
-            self.player_sprite.change_y = - PLAYER_SPEED_Y
+            if self.up_pressed and not self.down_pressed:
+                self.player_sprite.change_y = PLAYER_SPEED_Y
 
-        if self.player_sprite.change_x > 0 and self.player_sprite.change_y == 0:
-            self.player_sprite.wanted_angle = self.player_sprite.angle - 90 - self.player_sprite.angle
+            if self.down_pressed and not self.up_pressed:
+                self.player_sprite.change_y = - PLAYER_SPEED_Y
 
-        if self.player_sprite.change_x > 0 and self.player_sprite.change_y > 0:
-            self.player_sprite.wanted_angle = self.player_sprite.angle - 45 - self.player_sprite.angle
+            if self.player_sprite.change_x > 0 and self.player_sprite.change_y == 0:
+                self.player_sprite.wanted_angle = self.player_sprite.angle - 90 - self.player_sprite.angle
 
-        if self.player_sprite.change_x == 0 and self.player_sprite.change_y > 0:
-            self.player_sprite.wanted_angle = self.player_sprite.angle - 0 - self.player_sprite.angle
+            if self.player_sprite.change_x > 0 and self.player_sprite.change_y > 0:
+                self.player_sprite.wanted_angle = self.player_sprite.angle - 45 - self.player_sprite.angle
 
-        if self.player_sprite.change_x < 0 and self.player_sprite.change_y == 0:
-            self.player_sprite.wanted_angle = self.player_sprite.angle - -90 - self.player_sprite.angle
+            if self.player_sprite.change_x == 0 and self.player_sprite.change_y > 0:
+                self.player_sprite.wanted_angle = self.player_sprite.angle - 0 - self.player_sprite.angle
 
-        if self.player_sprite.change_x == 0 and self.player_sprite.change_y < 0:
-            self.player_sprite.wanted_angle = self.player_sprite.angle - -180 - self.player_sprite.angle
+            if self.player_sprite.change_x < 0 and self.player_sprite.change_y == 0:
+                self.player_sprite.wanted_angle = self.player_sprite.angle - -90 - self.player_sprite.angle
 
-        if self.player_sprite.change_x < 0 and self.player_sprite.change_y < 0:
-            self.player_sprite.wanted_angle = self.player_sprite.angle - -225 - self.player_sprite.angle
+            if self.player_sprite.change_x == 0 and self.player_sprite.change_y < 0:
+                self.player_sprite.wanted_angle = self.player_sprite.angle - -180 - self.player_sprite.angle
 
-        if self.player_sprite.change_x < 0 and self.player_sprite.change_y > 0:
-            self.player_sprite.wanted_angle = 45
+            if self.player_sprite.change_x < 0 and self.player_sprite.change_y < 0:
+                self.player_sprite.wanted_angle = self.player_sprite.angle - -225 - self.player_sprite.angle
 
-        if self.player_sprite.change_x > 0 and self.player_sprite.change_y < 0:
-            self.player_sprite.wanted_angle = -135
+            if self.player_sprite.change_x < 0 and self.player_sprite.change_y > 0:
+                self.player_sprite.wanted_angle = 45
 
-        # Move player with joystick if present
-        if self.joystick:
-            self.player_sprite.change_x = round(self.joystick.x) * PLAYER_SPEED_X
-            self.player_sprite.change_y = round(self.joystick.y) * PLAYER_SPEED_Y * -1
-            if round(self.joystick.x) == 1:
-                self.player_sprite.angle = -90
-            elif round(self.joystick.x) == -1:
-                self.player_sprite.angle = 90
-            elif round(self.joystick.y) == 1:
-                self.player_sprite.angle = 180
-            elif round(self.joystick.y) == -1:
-                self.player_sprite.angle = 0
+            if self.player_sprite.change_x > 0 and self.player_sprite.change_y < 0:
+                self.player_sprite.wanted_angle = -135
 
-        # Update player sprite
-        self.player_sprite.update(delta_time)
+            # Move player with joystick if present
+            if self.joystick:
+                self.player_sprite.change_x = round(self.joystick.x) * PLAYER_SPEED_X
+                self.player_sprite.change_y = round(self.joystick.y) * PLAYER_SPEED_Y * -1
+                if round(self.joystick.x) == 1:
+                    self.player_sprite.angle = -90
+                elif round(self.joystick.x) == -1:
+                    self.player_sprite.angle = 90
+                elif round(self.joystick.y) == 1:
+                    self.player_sprite.angle = 180
+                elif round(self.joystick.y) == -1:
+                    self.player_sprite.angle = 0
 
-        # add missing obstacles
-        while len(self.obstacle_list) < self.number_of_obstacles:
-            self.obstacle_list.append(Obstacle(speed=self.obstacle_speed, type=random.randint(1, 3), spawn_on_edge=True))
+            # Update player sprite
+            self.player_sprite.update(delta_time)
 
-        # Update the player shots
-        for o in self.obstacle_list:
-            o.on_update(delta_time)
+            # add missing obstacles
+            while len(self.obstacle_list) < self.number_of_obstacles:
+                self.obstacle_list.append(Obstacle(speed=self.obstacle_speed, type=random.randint(1, 3), spawn_on_edge=True))
 
-        self.level_timer -= delta_time
+            # Update the player shots
+            for o in self.obstacle_list:
+                o.on_update(delta_time)
 
-        if self.level_timer <= 0:
-            self.new_level()
+            self.level_timer -= delta_time
 
-        if self.obstacle_speed > Obstacle.obstacle_max_speed:
-            self.obstacle_speed = Obstacle.obstacle_max_speed
+            if self.level_timer <= 0:
+                self.new_level()
 
-        self.player_score += int((10. * delta_time) * 10)
-        if self.player_sprite.player_lives < 1:
-            print("your final score is", int(self.player_score * 10))
-            exit(0)
+            if self.obstacle_speed > Obstacle.obstacle_max_speed:
+                self.obstacle_speed = Obstacle.obstacle_max_speed
+
+            self.player_score += int((10. * delta_time) * 10)
+            if self.player_sprite.player_lives < 1:
+                print("your final score is", int(self.player_score * 10))
+                exit(0)
+        else:
+            pass
 
     def on_key_press(self, key, modifiers):
         """
