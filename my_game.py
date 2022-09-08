@@ -397,13 +397,13 @@ class MyGame(arcade.Window):
         # This command has to happen before we start drawing
         arcade.start_render()
 
-        # Draw the obstacles
-        self.obstacle_list.draw()
-
-        # Draw the player sprite
-        self.player_sprite.draw()
-
         if self.mode == "IN_GAME":
+
+            # Draw the obstacles
+            self.obstacle_list.draw()
+
+            # Draw the player sprite
+            self.player_sprite.draw()
 
             # Draw players score on screen
             arcade.draw_text(
@@ -434,6 +434,13 @@ class MyGame(arcade.Window):
                 arcade.color.WHITE  # Color of text
             )
 
+        elif self.mode == "IN_START_SCREEN":
+            arcade.draw_text(
+                "{}".format("press space to start"),  # Text to show
+                SCREEN_WIDTH/2,  # X position
+                SCREEN_HEIGHT/2,  # Y positon
+                arcade.color.WHITE  # Color of text
+            )
         else:
             pass
 
@@ -545,12 +552,16 @@ class MyGame(arcade.Window):
         if self.mode == "IN_GAME":
             if key == DASHING_KEY:
                 self.player_sprite.dash()
-        else:
-            pass
+
+        print("Key pressed:", key)
 
         if self.mode == "IN_START_SCREEN":
-            if self.key == DASHING_KEY:
+            if key == arcade.key.SPACE:
                 self.mode = "IN_GAME"
+        elif key == DASHING_KEY:
+            self.player_sprite.dash()
+        else:
+            pass
 
         print(self.mode)
 
