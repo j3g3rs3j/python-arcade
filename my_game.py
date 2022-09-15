@@ -376,14 +376,20 @@ class MyGame(arcade.Window):
             pass
 
     def set_mode(self, new_mode):
+        print("changemode", new_mode)
 
-        if new_mode == "IN_GAME":
+        if new_mode == "IN_START_SCREEN":
             pass
+            #self.new_level()
+            #new_mode = "IN_GAME"
+
+        elif new_mode == "IN_GAME":
+            self.new_level()
+            #self.player_sprite.dash()
 
         self.mode = new_mode
 
     def new_level(self):
-        assert self.mode == "IN_GAME"
 
         self.level_timer = LEVEL_TIME
 
@@ -569,7 +575,7 @@ class MyGame(arcade.Window):
 
         if self.mode == "IN_START_SCREEN":
             if key == arcade.key.SPACE:
-                self.mode = "IN_GAME"
+                self.set_mode("IN_GAME")
         elif key == DASHING_KEY:
             self.player_sprite.dash()
         else:
