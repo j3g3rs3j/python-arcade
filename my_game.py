@@ -26,8 +26,8 @@ PLAYER_START_X = SCREEN_WIDTH / 2
 PLAYER_START_Y = SCREEN_HEIGHT / 2
 PLAYER_SHOT_SPEED = 4
 OBSTACLE_SPEED = 6
-DASHING_TIME = 0.3
-DASH_COOLDOWN = 1
+DASHING_TIME = 0.2
+DASH_COOLDOWN = 0.75
 OBSTACLE_HARMLESS_TIME = 2.5
 OBSTACLE_HARMLESS_ALPHA = 100
 OBSTACLE_HARMLESS_SPEED_FACTOR = 0.3
@@ -118,8 +118,8 @@ class Player(arcade.Sprite):
 
         # Update center_x
         if self.is_dashing:
-            self.center_x += self.change_x * 3
-            self.center_y += self.change_y * 3
+            self.center_x += self.change_x * 6
+            self.center_y += self.change_y * 6
         else:
             self.center_x += self.change_x
             self.center_y += self.change_y
@@ -380,12 +380,9 @@ class MyGame(arcade.Window):
 
         if new_mode == "IN_START_SCREEN":
             pass
-            #self.new_level()
-            #new_mode = "IN_GAME"
 
         elif new_mode == "IN_GAME":
             self.new_level()
-            #self.player_sprite.dash()
 
         self.mode = new_mode
 
@@ -451,12 +448,19 @@ class MyGame(arcade.Window):
         elif self.mode == "IN_START_SCREEN":
             arcade.draw_text(
                 "{}".format("press space to start"),  # Text to show
-                SCREEN_WIDTH/2,  # X position
+                SCREEN_WIDTH/2 -250,  # X position
                 SCREEN_HEIGHT/2,  # Y positon
-                arcade.color.WHITE  # Color of text
+                arcade.color.WHITE,  # Color of text
+                50
             )
-        else:
-            pass
+        elif self.mode == "DEATH_SCREEN":
+            arcade.draw_text(
+                "{}".format("you die press space to return to start screen"),  # Text to show
+                SCREEN_WIDTH/2 -375,  # X position
+                SCREEN_HEIGHT/2,  # Y positon
+                arcade.color.WHITE,  # Color of text
+                30
+            )
 
     def on_update(self, delta_time):
         """
@@ -548,7 +552,21 @@ class MyGame(arcade.Window):
             self.player_score += int((10. * delta_time) * 10)
             if self.player_sprite.player_lives < 1:
                 print("your final score is", int(self.player_score * 10))
-                exit(0)
+                #exit(0)
+                self.set_mode("DEATH_SCREEN")
+                self.player_sprite.player_lives = 5
+                self.current_level = 0
+                self.player_score = 0
+                if self.mode == "DEATH_SCREEN":
+                    """
+                    arcade.draw_text(
+                        "{}".format("your final score is", int(self.player_score * 10)),  # Text to show
+                        SCREEN_WIDTH / 2 - 375,  # X position
+                        SCREEN_HEIGHT / 2 - 200,  # Y positon
+                        arcade.color.WHITE,  # Color of text
+                        30
+                    )
+                    """
         else:
             pass
 
@@ -576,10 +594,15 @@ class MyGame(arcade.Window):
         if self.mode == "IN_START_SCREEN":
             if key == arcade.key.SPACE:
                 self.set_mode("IN_GAME")
-        elif key == DASHING_KEY:
-            self.player_sprite.dash()
-        else:
-            pass
+
+        if self.mode == "IN_GAME":
+            if key == DASHING_KEY:
+                self.player_sprite.dash()
+
+        if self.mode == "DEATH_SCREEN":
+            if key == arcade.key.SPACE:
+                self.set_mode("IN_START_SCREEN")
+
 
         print(self.mode)
 
