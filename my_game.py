@@ -26,7 +26,8 @@ PLAYER_START_X = SCREEN_WIDTH / 2
 PLAYER_START_Y = SCREEN_HEIGHT / 2
 PLAYER_SHOT_SPEED = 4
 OBSTACLE_SPEED = 6
-DASHING_TIME = 0.2
+DASHING_TIME = 1
+DASHING_SPEED = 5
 DASH_COOLDOWN = 0.75
 OBSTACLE_HARMLESS_TIME = 2.5
 OBSTACLE_HARMLESS_ALPHA = 100
@@ -118,8 +119,8 @@ class Player(arcade.Sprite):
 
         # Update center_x
         if self.is_dashing:
-            self.center_x += self.change_x * 6
-            self.center_y += self.change_y * 6
+            self.center_x += self.change_x * DASHING_SPEED
+            self.center_y += self.change_y * DASHING_SPEED
         else:
             self.center_x += self.change_x
             self.center_y += self.change_y
@@ -136,6 +137,14 @@ class Player(arcade.Sprite):
 
         if not self.is_dashing:
             self.dash_cooldown -= delta_time
+
+#class power_ups(arcade.sprite):
+
+#    super()__init__("images/power-ups/pill_red.png", SPRITE_SCALING)
+
+
+
+
 
 class Obstacle(arcade.Sprite):
     """
@@ -306,6 +315,7 @@ class MyGame(arcade.Window):
         # Variable that will hold a list of shots fired by the player
         self.player_shot_list = None
         self.obstacle_list = None
+        self.power_ups_list = None
         self.number_of_obstacles = None
 
         # Set up the player info
@@ -595,13 +605,16 @@ class MyGame(arcade.Window):
             if key == arcade.key.SPACE:
                 self.set_mode("IN_GAME")
 
-        if self.mode == "IN_GAME":
+        elif self.mode == "IN_GAME":
             if key == DASHING_KEY:
                 self.player_sprite.dash()
 
-        if self.mode == "DEATH_SCREEN":
+        elif self.mode == "DEATH_SCREEN":
             if key == arcade.key.SPACE:
                 self.set_mode("IN_START_SCREEN")
+
+        else:
+            exit("you a failure you no mean to exist")
 
 
         print(self.mode)
