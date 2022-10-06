@@ -138,13 +138,16 @@ class Player(arcade.Sprite):
         if not self.is_dashing:
             self.dash_cooldown -= delta_time
 
-#class power_ups(arcade.sprite):
+class PowerUp(arcade.Sprite):
+    def __init__(self):
 
-#    super()__init__("images/power-ups/pill_red.png", SPRITE_SCALING)
+        super().__init__("images/power-ups/pill_red.png", SPRITE_SCALING)
 
+        self.center_x = random.randint(0,SCREEN_WIDTH)
+        self.center_y = random.randint(0,SCREEN_HEIGHT)
 
-
-
+    def on_update(self, delta_time):
+        pass
 
 class Obstacle(arcade.Sprite):
     """
@@ -261,8 +264,6 @@ class Obstacle(arcade.Sprite):
             self.change_y = self.speed_y
             self.angle += self.change_angle
 
-
-
 class PlayerShot(arcade.Sprite):
     """
     A shot fired by the Player
@@ -291,7 +292,6 @@ class PlayerShot(arcade.Sprite):
         # Remove shot when over top of screen
         if self.bottom > SCREEN_HEIGHT:
             self.kill()
-
 
 class MyGame(arcade.Window):
     """
@@ -368,6 +368,11 @@ class MyGame(arcade.Window):
 
         # Sprite lists
         self.player_shot_list = arcade.SpriteList()
+        self.power_ups_list = arcade.SpriteList()
+
+        #creating a power up when you start the game
+        self.power_ups_list.append(PowerUp())
+
 
         # Create a Player object
         self.player_sprite = Player(
@@ -423,6 +428,8 @@ class MyGame(arcade.Window):
             # Draw the obstacles
             self.obstacle_list.draw()
 
+            self.power_ups_list.draw()
+
             # Draw the player sprite
             self.player_sprite.draw()
 
@@ -477,11 +484,17 @@ class MyGame(arcade.Window):
         Movement and game logic
         """
 
+        self.power_ups_list.on_update()
+
         if self.mode == "IN_GAME":
 
             # Calculate player speed based on the keys pressed
             self.player_sprite.change_x = 0
             self.player_sprite.change_y = 0
+
+            """
+            check_for_collisions
+            """
 
             obstacles_colliding_with_player = arcade.check_for_collision_with_list(
                 self.player_sprite, self.obstacle_list
@@ -489,6 +502,8 @@ class MyGame(arcade.Window):
             for o in obstacles_colliding_with_player:
                 if self.player_sprite.is_dashing is False and not o.is_harmless:
                     self.player_sprite.taking_damage()
+
+
 
             # Move player with keyboard
             if self.left_pressed and not self.right_pressed:
