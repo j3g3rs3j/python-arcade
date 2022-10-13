@@ -37,6 +37,7 @@ LEVEL_TIME = 20
 
 TAKING_DAMAGE_TIME = 0.75
 LIVES_TAKING_DAMAGE = 1
+LIVES_GOTTEN_BY_POWER_UP = 1
 DASH_ALPHA = 150
 
 
@@ -91,6 +92,9 @@ class Player(arcade.Sprite):
             self.player_lives -= LIVES_TAKING_DAMAGE
 
 
+    def getting_life(self, number_of_lives):
+        self.player_lives += number_of_lives
+
     def update(self, delta_time):
         """
         Move the sprite
@@ -141,13 +145,26 @@ class Player(arcade.Sprite):
 class PowerUp(arcade.Sprite):
     def __init__(self):
 
-        super().__init__("images/power-ups/pill_red.png", SPRITE_SCALING)
+        super().__init__("images/power-ups/pill_red.png", SPRITE_SCALING * 2.2)
 
         self.center_x = random.randint(0,SCREEN_WIDTH)
         self.center_y = random.randint(0,SCREEN_HEIGHT)
+        self.power_up_despawn_cooldown = 0
+        self.alpha = 255
 
     def on_update(self, delta_time):
-        pass
+        if self.power_up_despawn_cooldown <= 0:
+            self.power_up_despawn_cooldown = 5
+
+
+        self.power_up_despawn_cooldown -= delta_time
+
+        if self.power_up_despawn_cooldown <= 0:
+            self.kill_yourself()
+
+    def kill_yourself(self):
+        self.kill()
+
 
 class Obstacle(arcade.Sprite):
     """
@@ -311,6 +328,7 @@ class MyGame(arcade.Window):
         self.level_timer = None
         self.player_score = None
         self.mode = None
+        self.respawn_powerup = 0
 
         # Variable that will hold a list of shots fired by the player
         self.player_shot_list = None
@@ -398,6 +416,7 @@ class MyGame(arcade.Window):
 
         elif new_mode == "IN_GAME":
             self.new_level()
+            self.power_ups_list.append(PowerUp())
 
         self.mode = new_mode
 
@@ -502,6 +521,28 @@ class MyGame(arcade.Window):
             for o in obstacles_colliding_with_player:
                 if self.player_sprite.is_dashing is False and not o.is_harmless:
                     self.player_sprite.taking_damage()
+
+            power_ups_colliding_with_player = arcade.check_for_collision_with_list(
+                self.player_sprite, self.power_ups_list
+            )
+            for pu in power_ups_colliding_with_player:
+                self.player_sprite.getting_life(LIVES_GOTTEN_BY_POWER_UP)
+                pu.kill_yourself()
+
+
+            #respawns powerup
+
+            if self.respawn_powerup <= 0:
+                self.respawn_powerup = 8
+
+            if self.respawn_powerup <= 0:
+                self.respawn_powerup = 8
+
+            self.respawn_powerup -= delta_time
+
+            if self.respawn_powerup <= 0:
+                self.power_ups_list.append(PowerUp())
+
 
 
 
