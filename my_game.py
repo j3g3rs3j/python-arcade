@@ -167,7 +167,7 @@ class PowerUp(arcade.Sprite):
 
 
     def score_up(self, player):
-        pass
+        player.score += 20000
 
     def life_up(self, player):
         player.getting_life(LIVES_GOTTEN_BY_POWER_UP)
