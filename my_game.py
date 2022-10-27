@@ -145,17 +145,15 @@ class Player(arcade.Sprite):
 class PowerUp(arcade.Sprite):
     def __init__(self):
 
-        super().__init__("images/power-ups/pill_red.png", SPRITE_SCALING * 2.2)
+        super().__init__("images/power-ups/pill_red.png", SPRITE_SCALING * 3.2)
 
         self.center_x = random.randint(0,SCREEN_WIDTH)
         self.center_y = random.randint(0,SCREEN_HEIGHT)
-        self.power_up_despawn_cooldown = 0
+        self.power_up_despawn_cooldown = 5
         self.alpha = 255
+        self.power_up_function = random.choice([self.life_up, self.score_up])
 
     def on_update(self, delta_time):
-        if self.power_up_despawn_cooldown <= 0:
-            self.power_up_despawn_cooldown = 5
-
 
         self.power_up_despawn_cooldown -= delta_time
 
@@ -165,6 +163,12 @@ class PowerUp(arcade.Sprite):
     def kill_yourself(self):
         self.kill()
 
+
+    def score_up(self, player):
+        pass
+
+    def life_up(self, player):
+        player.getting_life(LIVES_GOTTEN_BY_POWER_UP)
 
 class Obstacle(arcade.Sprite):
     """
@@ -526,7 +530,7 @@ class MyGame(arcade.Window):
                 self.player_sprite, self.power_ups_list
             )
             for pu in power_ups_colliding_with_player:
-                self.player_sprite.getting_life(LIVES_GOTTEN_BY_POWER_UP)
+                pu.power_up_function(self.player_sprite)
                 pu.kill_yourself()
 
 
