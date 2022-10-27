@@ -71,6 +71,8 @@ class Player(arcade.Sprite):
 
         self.wanted_angle = 0
 
+        self.score = 0
+
         self.is_dashing = False
         self.dashing_time_left = 0
         self.dash_cooldown = 0
@@ -330,7 +332,6 @@ class MyGame(arcade.Window):
         print(self.get_viewport())
 
         self.level_timer = None
-        self.player_score = None
         self.mode = None
         self.respawn_powerup = 0
 
@@ -342,7 +343,6 @@ class MyGame(arcade.Window):
 
         # Set up the player info
         self.player_sprite = None
-        self.player_score = None
 
         # Track the current state of what key is pressed
         self.left_pressed = False
@@ -385,22 +385,12 @@ class MyGame(arcade.Window):
         # if you'r in deathscreen, mode = "DEATH_SCREEN"
         self.mode = "IN_START_SCREEN"
 
-        # No points when the game starts
-        self.player_score = 0
-
         # Sprite lists
         self.player_shot_list = arcade.SpriteList()
         self.power_ups_list = arcade.SpriteList()
 
         #creating a power up when you start the game
         self.power_ups_list.append(PowerUp())
-
-
-        # Create a Player object
-        self.player_sprite = Player(
-            center_x=PLAYER_START_X,
-            center_y=PLAYER_START_Y
-        )
 
         self.current_level = 0
         self.obstacle_speed = OBSTACLE_SPEED
@@ -419,6 +409,12 @@ class MyGame(arcade.Window):
             pass
 
         elif new_mode == "IN_GAME":
+            # Create a Player object
+            self.player_sprite = Player(
+                center_x=PLAYER_START_X,
+                center_y=PLAYER_START_Y
+            )
+
             self.new_level()
             self.power_ups_list.append(PowerUp())
 
@@ -465,7 +461,7 @@ class MyGame(arcade.Window):
             )
 
             arcade.draw_text(
-                "score: {}".format(int(self.player_score) * 10),  # Text to show
+                "score: {}".format(int(self.player_sprite.score) * 10),  # Text to show
                 10,  # X position
                 SCREEN_HEIGHT - 40,  # Y positon
                 arcade.color.WHITE  # Color of text
@@ -619,14 +615,16 @@ class MyGame(arcade.Window):
             if self.obstacle_speed > Obstacle.obstacle_max_speed:
                 self.obstacle_speed = Obstacle.obstacle_max_speed
 
-            self.player_score += int((10. * delta_time) * 10)
+            # score system: time = more score
+            self.player_sprite.score += int((10.0 * delta_time) * 10)
+
             if self.player_sprite.player_lives < 1:
-                print("your final score is", int(self.player_score * 10))
+                print("your final score is", int(self.player_sprite.score * 10))
                 #exit(0)
                 self.set_mode("DEATH_SCREEN")
                 self.player_sprite.player_lives = 5
+                #self.player_sprite.score = 0
                 self.current_level = 0
-                self.player_score = 0
                 if self.mode == "DEATH_SCREEN":
                     """
                     arcade.draw_text(
