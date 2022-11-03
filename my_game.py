@@ -10,13 +10,11 @@ Artwork from https://kenney.nl/assets/space-shooter-redux
 import arcade
 import random
 
-
-
 SPRITE_SCALING = 0.4
 
 # Set the size of the screen
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 2000
+SCREEN_HEIGHT = 1600
 
 # Variables controlling the player
 PLAYER_LIVES = 5
@@ -26,21 +24,19 @@ PLAYER_START_X = SCREEN_WIDTH / 2
 PLAYER_START_Y = SCREEN_HEIGHT / 2
 PLAYER_SHOT_SPEED = 4
 OBSTACLE_SPEED = 6
-DASHING_TIME = 1
-DASHING_SPEED = 5
-DASH_COOLDOWN = 0.75
+DASHING_TIME = 0.2
+DASHING_SPEED = 7
+DASH_COOLDOWN = DASHING_TIME + 0.5
 OBSTACLE_HARMLESS_TIME = 2.5
 OBSTACLE_HARMLESS_ALPHA = 100
 OBSTACLE_HARMLESS_SPEED_FACTOR = 0.3
 # length of a level in seconds
-LEVEL_TIME = 20
+LEVEL_TIME = 3.5
 
 TAKING_DAMAGE_TIME = 0.75
 LIVES_TAKING_DAMAGE = 1
 LIVES_GOTTEN_BY_POWER_UP = 1
 DASH_ALPHA = 150
-
-
 
 DASHING_KEY = arcade.key.SPACE
 
@@ -53,7 +49,6 @@ class Player(arcade.Sprite):
         """
         Setup new Player object
         """
-
 
         # How much to scale the graphics
         kwargs['scale'] = SPRITE_SCALING
@@ -92,7 +87,6 @@ class Player(arcade.Sprite):
             self.taking_damage_timer = TAKING_DAMAGE_TIME
             self.texture = arcade.load_texture(self.taking_damage_path)
             self.player_lives -= LIVES_TAKING_DAMAGE
-
 
     def getting_life(self, number_of_lives):
         self.player_lives += number_of_lives
@@ -147,13 +141,16 @@ class Player(arcade.Sprite):
 class PowerUp(arcade.Sprite):
     def __init__(self):
 
-        super().__init__("images/power-ups/pill_red.png", SPRITE_SCALING * 3.2)
+        super().__init__("images/power-ups/pill_red.png", SPRITE_SCALING * 6.4)
 
         self.center_x = random.randint(0,SCREEN_WIDTH)
         self.center_y = random.randint(0,SCREEN_HEIGHT)
         self.power_up_despawn_cooldown = 5
         self.alpha = 255
         self.power_up_function = random.choice([self.life_up, self.score_up])
+
+        if self.power_up_function == self.score_up:
+            self.texture = arcade.load_texture("images/power-ups/pill_blue.png")
 
     def on_update(self, delta_time):
 
